@@ -32,27 +32,25 @@ document.addEventListener("DOMContentLoaded", function () {
         deliveryCostDiv.style.display = (type === 3) ? "block" : "none";
     });
 
-    // ===== جلب الفئات =====
-    fetch(API_BASE + "/api/categories")
-        .then(function (res) { return res.json(); })
-        .then(function (categories) {
-            categoriesContainer.innerHTML = "";
-
-            for (var i = 0; i < categories.length; i++) {
-                (function (cat) {
-                    var btn = document.createElement("button");
-                    btn.className = "Category-btn";
-                    btn.textContent = cat.CategoryName;
-                    btn.onclick = function () {
-                        loadItems(cat.CategoryID);
-                    };
-                    categoriesContainer.appendChild(btn);
-                })(categories[i]);
-            }
-        })
-        .catch(function (err) {
-            console.error("خطأ الفئات", err);
-        });
+  fetch(API_BASE + "/api/categories")
+    .then(function (res) { return res.json(); })
+    .then(function (categories) {
+        categoriesContainer.innerHTML = "";
+        for (var i = 0; i < categories.length; i++) {
+            (function (cat) {
+                var btn = document.createElement("button");
+                btn.className = "Category-btn";
+                btn.textContent = cat.categoryName; // اسم الفئة يظهر هنا
+                btn.onclick = function () {
+                    loadItems(cat.categoryID); // عند الضغط على الزر تستدعي الأصناف
+                };
+                categoriesContainer.appendChild(btn);
+            })(categories[i]);
+        }
+    })
+    .catch(function (err) {
+        console.error("خطأ الفئات", err);
+    });
 
     // ===== جلب الأصناف =====
     function loadItems(categoryId) {
@@ -65,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     (function (item) {
                         var btn = document.createElement("button");
                         btn.className = "item-btn";
-                        btn.textContent = item.ItemName + " - " + item.Price + " د.ع";
+                        btn.textContent = item.itemName + " - " + item.price + " د.ع";
                         btn.onclick = function () {
                             addToOrder(item);
                         };
