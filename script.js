@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var currentOrderItems = [];
 
-const API_BASE = "http://192.168.192.103:7173";
+const API_BASE = "https://192.168.192.103:7173";
     // ===== نوع الطلب =====
     orderTypeSelect.addEventListener("change", function () {
         var type = parseInt(orderTypeSelect.value);
@@ -157,6 +157,7 @@ const API_BASE = "http://192.168.192.103:7173";
     });
 
 });
+
 
 
 
