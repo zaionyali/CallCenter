@@ -20,8 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var currentOrderItems = [];
 
-    var API_BASE = "https://localhost:7173";
-
+const API_BASE = "http://192.168.192.103:7173";
     // ===== نوع الطلب =====
     orderTypeSelect.addEventListener("change", function () {
         var type = parseInt(orderTypeSelect.value);
@@ -81,8 +80,8 @@ document.addEventListener("DOMContentLoaded", function () {
         var found = false;
 
         for (var i = 0; i < currentOrderItems.length; i++) {
-            if (currentOrderItems[i].ItemID === item.ItemID) {
-                currentOrderItems[i].Qty++;
+            if (currentOrderItems[i].itemID === item.itemID) {
+                currentOrderItems[i].qty++;
                 found = true;
                 break;
             }
@@ -90,10 +89,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!found) {
             currentOrderItems.push({
-                ItemID: item.ItemID,
-                ItemName: item.ItemName,
-                Price: item.Price,
-                Qty: 1
+                itemID: item.itemID,
+                itemName: item.itemName,
+                price: item.price,
+                qty: 1
             });
         }
 
@@ -107,13 +106,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         for (var i = 0; i < currentOrderItems.length; i++) {
             var it = currentOrderItems[i];
-            total += it.Price * it.Qty;
+            total += it.price * it.qty;
 
             var row = document.createElement("div");
             row.className = "order-item";
             row.innerHTML =
-                "<span>" + it.ItemName + " × " + it.Qty + "</span>" +
-                "<span>" + (it.Price * it.Qty) + " د.ع</span>";
+                "<span>" + it.itemName + " × " + it.qty + "</span>" +
+                "<span>" + (it.price * it.qty) + " د.ع</span>";
 
             orderContainer.appendChild(row);
         }
