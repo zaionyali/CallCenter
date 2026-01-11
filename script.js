@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var orderContainer = document.getElementById("orderContainer");
     var orderTotalDiv = document.getElementById("orderTotal");
     var sendButton = document.getElementById("sendOrder");
+    var backButton = document.getElementById("backToCategories");
 
     var orderTypeSelect = document.getElementById("orderType");
     var tableDiv = document.getElementById("tableDiv");
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var currentOrderItems = [];
 
-const API_BASE = "http://192.168.192.103:7173";
+    const API_BASE = window.location.origin;
     // ===== نوع الطلب =====
     orderTypeSelect.addEventListener("change", function () {
         var type = parseInt(orderTypeSelect.value);
@@ -31,29 +32,31 @@ const API_BASE = "http://192.168.192.103:7173";
         deliveryCostDiv.style.display = (type === 3) ? "block" : "none";
     });
 
-  fetch(API_BASE + "/api/categories")
-    .then(function (res) { return res.json(); })
-    .then(function (categories) {
-        categoriesContainer.innerHTML = "";
-        for (var i = 0; i < categories.length; i++) {
-            (function (cat) {
-                var btn = document.createElement("button");
-                btn.className = "Category-btn";
-                btn.textContent = cat.categoryName; // اسم الفئة يظهر هنا
-                btn.onclick = function () {
-                    loadItems(cat.categoryID); // عند الضغط على الزر تستدعي الأصناف
-                };
-                categoriesContainer.appendChild(btn);
-            })(categories[i]);
-        }
-    })
-    .catch(function (err) {
-        console.error("خطأ الفئات", err);
-    });
+    fetch(API_BASE + "/api/categories")
+        .then(function (res) { return res.json(); })
+        .then(function (categories) {
+            categoriesContainer.innerHTML = "";
+            for (var i = 0; i < categories.length; i++) {
+                (function (cat) {
+                    var btn = document.createElement("button");
+                    btn.className = "Category-btn";
+                    btn.textContent = cat.categoryName; // اسم الفئة يظهر هنا
+                    btn.onclick = function () {
+                        loadItems(cat.categoryID); // عند الضغط على الزر تستدعي الأصناف
+                    };
+                    categoriesContainer.appendChild(btn);
+                })(categories[i]);
+            }
+        })
+        .catch(function (err) {
+            console.error("خطأ الفئات", err);
+        });
 
     // ===== جلب الأصناف =====
     function loadItems(categoryId) {
         itemsContainer.innerHTML = "";
+        categoriesContainer.style.display = "none";
+        backButton.style.display = "block";
 
         fetch(API_BASE + "/api/items?categoryId=" + categoryId)
             .then(function (res) { return res.json(); })
@@ -69,11 +72,13 @@ const API_BASE = "http://192.168.192.103:7173";
                         itemsContainer.appendChild(btn);
                     })(items[i]);
                 }
-            })
-            .catch(function (err) {
-                console.error("خطأ الأصناف", err);
             });
     }
+    backButton.addEventListener("click", function () {
+        itemsContainer.innerHTML = "";
+        categoriesContainer.style.display = "grid";
+        backButton.style.display = "none";
+    });
 
     // ===== إضافة صنف =====
     function addToOrder(item) {
@@ -105,16 +110,33 @@ const API_BASE = "http://192.168.192.103:7173";
         var total = 0;
 
         for (var i = 0; i < currentOrderItems.length; i++) {
-            var it = currentOrderItems[i];
-            total += it.price * it.qty;
+            (function (index) {
+                var it = currentOrderItems[index];
+                total += it.price * it.qty;
 
-            var row = document.createElement("div");
-            row.className = "order-item";
-            row.innerHTML =
-                "<span>" + it.itemName + " × " + it.qty + "</span>" +
-                "<span>" + (it.price * it.qty) + " د.ع</span>";
+                var row = document.createElement("div");
+                row.className = "order-item";
 
-            orderContainer.appendChild(row);
+                row.innerHTML =
+                    "<span>" + it.itemName + " × " + it.qty + "</span>" +
+                    "<span>" +
+                    (it.price * it.qty) + " د.ع " +
+                    "<button style='background:red;color:#fff;border:none;" +
+                    "border-radius:6px;padding:4px 8px;margin-right:6px;" +
+                    "cursor:pointer'>❌</button>" +
+                    "</span>";
+
+                // زر الحذف
+                row.querySelector("button").onclick = function () {
+                    currentOrderItems[index].qty--;
+                    if (currentOrderItems[index].qty <= 0) {
+                        currentOrderItems.splice(index, 1);
+                    }
+                    renderOrder();
+                };
+
+                orderContainer.appendChild(row);
+            })(i);
         }
 
         if (parseInt(orderTypeSelect.value) === 3) {
@@ -154,11 +176,6 @@ const API_BASE = "http://192.168.192.103:7173";
                 currentOrderItems = [];
                 renderOrder();
             });
-    });
+    });
 
 });
-
-
-
-
-
